@@ -26,7 +26,7 @@
   <hr>
 
   <div id="chuck-norris">
-    <h3>Chuck Norris vitsi:</h3>
+    <h3>Uusi ominaisuus -> Chuck Norris vitsi:</h3>
     <button id="fetch-joke">Hae uusi vitsi</button>
     <p id="joke">Tässä uusi ominaisuuteni sivulle -> Klikkaa nappia saadaksesi vitsin!</p>
   </div>
@@ -40,6 +40,37 @@
         p.textContent = data.value;
       } catch (err) {
         p.textContent = 'Virhe haettaessa vitsiä.';
+      }
+    });
+  </script>
+
+  <hr>
+
+  <!-- 🧪 Testien ajon osio -->
+  <div id="test-section">
+    <h3>Suorita backend‑testit</h3>
+    <button id="run-tests">Aja testit</button>
+    <pre id="test-results" style="background:#f4f4f4; padding:10px; border:1px solid #ccc;"></pre>
+  </div>
+
+  <script>
+    document.getElementById('run-tests').addEventListener('click', async () => {
+      const resultsEl = document.getElementById('test-results');
+      resultsEl.textContent = "Ajetaan testejä… odota hetki …";
+
+      try {
+        const res = await fetch('/cicd/api/run-tests');
+        const data = await res.json();
+
+        // Kokoa tulosviesti
+        let output = "";
+        output += "Return code: " + data.returncode + "\n\n";
+        output += "=== STDOUT ===\n" + data.stdout + "\n";
+        output += "=== STDERR ===\n" + data.stderr + "\n";
+
+        resultsEl.textContent = output;
+      } catch (err) {
+        resultsEl.textContent = "Virhe testejä ajettaessa: " + err;
       }
     });
   </script>

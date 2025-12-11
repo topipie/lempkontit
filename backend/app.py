@@ -1,8 +1,9 @@
 from flask import Flask, jsonify
 import os
 import mysql.connector
+import subprocess
 
-#flask app instance update
+# flask app instance
 app = Flask(__name__)
 
 DB_HOST = os.getenv('DB_HOST', 'db')
@@ -16,8 +17,7 @@ def health():
 
 @app.get('/api/time')
 def time():
-    # Placeholder for actual time fetching logic
-    #get server time from db
+    # get server time from db
     conn = mysql.connector.connect(
         host=DB_HOST,
         user=DB_USER,
@@ -27,8 +27,9 @@ def time():
     cur = conn.cursor()
     cur.execute("SELECT NOW()")
     row = cur.fetchone()
-    cur.close(); conn.close()
-    return jsonify(message={'time': row[0]})
+    cur.close()
+    conn.close()
+    return jsonify(message={'time': str(row[0])})
 
 @app.get('/api')
 def index():
@@ -42,10 +43,30 @@ def index():
     cur = conn.cursor()
     cur.execute("SELECT 'Hello from MySQL via Testi!'")
     row = cur.fetchone()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     return jsonify(message=row[0])
+
+# 🧪 Test endpoint: Ajaa test‑skriptin ja palauttaa tulokset JSONina
+@app.get('/api/run-tests')
+def run_tests():
+    # Polku palvelimella olevaan testiskriptiin
+    script_path = "/opt/lemp/test-backend.sh"
+
+    # Ajetaan skripti
+    result = subprocess.run(
+        [script_path],
+        capture_output=True,
+        text=True
+    )
+
+    # Palautetaan JSON‑vastaus
+    return jsonify({
+        "stdout": result.stdout,
+        "stderr": result.stderr,
+        "returncode": result.returncode
+    })
 
 if __name__ == '__main__':
     # Dev-only fallback
     app.run(host='0.0.0.0', port=8000, debug=True)
-
