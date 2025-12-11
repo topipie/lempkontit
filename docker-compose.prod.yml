@@ -23,6 +23,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    ports:
+      - "8000:8000"   # backend API näkyviin myös hostille
 
   frontend:
     image: ${DOCKERHUB_USERNAME}/lemp-frontend:latest
