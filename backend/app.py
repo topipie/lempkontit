@@ -49,44 +49,39 @@ def index():
 # 🧪 Test endpoint: testaa backend‑endpointeja
 @app.get('/api/run-tests')
 def run_tests():
-    results = {}
-    errors = []
+    results = {
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+    }
 
     # Test /api
     try:
         with app.test_client() as client:
             r1 = client.get('/api')
             if r1.status_code == 200:
-                results['api'] = "Backend toimii"
+                results["stdout"] += "/api OK\n"
             else:
-                errors.append(f"/api returned status {r1.status_code}")
+                results["stderr"] += f"/api returned status {r1.status_code}\n"
+                results["returncode"] = 1
     except Exception as e:
-        errors.append(f"/api error: {str(e)}")
+        results["stderr"] += f"/api error: {str(e)}\n"
+        results["returncode"] = 1
 
     # Test /api/time
     try:
         with app.test_client() as client:
             r2 = client.get('/api/time')
             if r2.status_code == 200:
-                results['time'] = "Backend toimii"
+                results["stdout"] += "/api/time OK\n"
             else:
-                errors.append(f"/api/time returned status {r2.status_code}")
+                results["stderr"] += f"/api/time returned status {r2.status_code}\n"
+                results["returncode"] = 1
     except Exception as e:
-        errors.append(f"/api/time error: {str(e)}")
+        results["stderr"] += f"/api/time error: {str(e)}\n"
+        results["returncode"] = 1
 
-    # Koostetaan vastaus
-    if errors:
-        return jsonify({
-            "message": "Backend testissä virheitä",
-            "errors": errors,
-            **results
-        }), 500
-
-    # Jos kaikki toimii
-    return jsonify({
-        "message": "Backend toimii",
-        **results
-    })
+    return jsonify(results)
 
 if __name__ == '__main__':
     # Dev-only fallback
