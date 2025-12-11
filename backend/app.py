@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 import os
 import mysql.connector
-import subprocess
 
 # flask app instance
 app = Flask(__name__)
@@ -47,25 +46,30 @@ def index():
     conn.close()
     return jsonify(message=row[0])
 
-# 🧪 Test endpoint: Ajaa test‑skriptin ja palauttaa tulokset JSONina
+# 🧪 Test endpoint: Ajaa backend–testit ja palauttaa tulokset JSONina
 @app.get('/api/run-tests')
 def run_tests():
-    # Polku palvelimella olevaan testiskriptiin
-    script_path = "/opt/lemp/test-backend.sh"
+    results = {}
 
-    # Ajetaan skripti
-    result = subprocess.run(
-        [script_path],
-        capture_output=True,
-        text=True
-    )
+    # Test /api
+    try:
+        with app.test_client() as client:
+            r1 = client.get('/api')
+            results['api_status'] = r1.status_code
+            results['api_body'] = r1.json
+    except Exception as e:
+        results['api_error'] = str(e)
 
-    # Palautetaan JSON‑vastaus
-    return jsonify({
-        "stdout": result.stdout,
-        "stderr": result.stderr,
-        "returncode": result.returncode
-    })
+    # Test /api/time
+    try:
+        with app.test_client() as client:
+            r2 = client.get('/api/time')
+            results['time_status'] = r2.status_code
+            results['time_body'] = r2.json
+    except Exception as e:
+        results['time_error'] = str(e)
+
+    return jsonify(results)
 
 if __name__ == '__main__':
     # Dev-only fallback
