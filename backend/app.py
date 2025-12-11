@@ -46,30 +46,47 @@ def index():
     conn.close()
     return jsonify(message=row[0])
 
-# 🧪 Test endpoint: Ajaa backend–testit ja palauttaa tulokset JSONina
+# 🧪 Test endpoint: testaa backend‑endpointeja
 @app.get('/api/run-tests')
 def run_tests():
     results = {}
+    errors = []
 
     # Test /api
     try:
         with app.test_client() as client:
             r1 = client.get('/api')
-            results['api_status'] = r1.status_code
-            results['api_body'] = r1.json
+            if r1.status_code == 200:
+                results['api'] = "Backend toimii"
+            else:
+                errors.append(f"/api returned status {r1.status_code}")
     except Exception as e:
-        results['api_error'] = str(e)
+        errors.append(f"/api error: {str(e)}")
 
     # Test /api/time
     try:
         with app.test_client() as client:
             r2 = client.get('/api/time')
-            results['time_status'] = r2.status_code
-            results['time_body'] = r2.json
+            if r2.status_code == 200:
+                results['time'] = "Backend toimii"
+            else:
+                errors.append(f"/api/time returned status {r2.status_code}")
     except Exception as e:
-        results['time_error'] = str(e)
+        errors.append(f"/api/time error: {str(e)}")
 
-    return jsonify(results)
+    # Koostetaan vastaus
+    if errors:
+        return jsonify({
+            "message": "Backend testissä virheitä",
+            "errors": errors,
+            **results
+        }), 500
+
+    # Jos kaikki toimii
+    return jsonify({
+        "message": "Backend toimii",
+        **results
+    })
 
 if __name__ == '__main__':
     # Dev-only fallback
