@@ -9,7 +9,7 @@
 
   <div id="msg">Loading...</div>
   <script>
-    fetch('/api')
+    fetch('/cicd/api')
       .then(r => r.json())
       .then(d => { document.getElementById('msg').innerText = d.message; })
       .catch(e => { document.getElementById('msg').innerText = 'API error: ' + e; });
@@ -17,7 +17,7 @@
 
   <div id="time">Loading time...</div>
   <script>
-    fetch('/api/time')
+    fetch('/cicd/api/time')
       .then(r => r.json())
       .then(d => { document.getElementById('time').innerText = d.time; })
       .catch(e => { document.getElementById('time').innerText = 'API error: ' + e; });
