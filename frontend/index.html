@@ -2,10 +2,11 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Kontti11i11111111iaaaaii LEMP Esimerkki</title>
+  <title>Konttiiii LEMP Esimerkki</title>
 </head>
 <body>
-  <h1>Frontend (Nginx) update</h1>
+  <h1>Frontend (Nginx) update. Sivusto päivittyy itesestään!!!!! Hakee myös kannasta kommentin</h1>
+
   <div id="msg">Loading...</div>
   <script>
     fetch('/api')
@@ -20,6 +21,27 @@
       .then(r => r.json())
       .then(d => { document.getElementById('time').innerText = d.time; })
       .catch(e => { document.getElementById('time').innerText = 'API error: ' + e; });
+  </script>
+
+  <hr>
+
+  <div id="chuck-norris">
+    <h3>Chuck Norris vitsi:</h3>
+    <button id="fetch-joke">Hae uusi vitsi</button>
+    <p id="joke">Tässä uusi ominaisuuteni sivulle -> Klikkaa nappia saadaksesi vitsin!</p>
+  </div>
+
+  <script>
+    document.getElementById('fetch-joke').addEventListener('click', async () => {
+      const p = document.getElementById('joke');
+      try {
+        const response = await fetch('https://api.chucknorris.io/jokes/random');
+        const data = await response.json();
+        p.textContent = data.value;
+      } catch (err) {
+        p.textContent = 'Virhe haettaessa vitsiä.';
+      }
+    });
   </script>
 
 </body>
